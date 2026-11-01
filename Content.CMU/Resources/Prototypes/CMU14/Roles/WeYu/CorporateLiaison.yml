@@ -86,6 +86,7 @@
   - AUPrisonStaff
   - auwy
   access:
+  - CMUAccessWeylandPersonnel
   - AU14AccessCorporateWEYULiaison
   roleWeight: 0.25
 

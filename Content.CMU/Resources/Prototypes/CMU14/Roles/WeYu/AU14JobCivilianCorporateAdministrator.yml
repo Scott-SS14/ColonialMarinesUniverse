@@ -49,6 +49,7 @@
   - auadmin
   - AUPrisonStaff
   access:
+  - CMUAccessWeylandPersonnel
   - AU14AccessCorporateWEYULiaison
   - AU14AccessColonyAdministrator
   roleWeight: 0.25
