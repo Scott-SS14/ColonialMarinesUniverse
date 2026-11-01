@@ -1,0 +1,487 @@
+- type: entity
+  abstract: true
+  parent: CMBaseStructure
+  id: CMUEmploymentConsoleBase
+  components:
+  - type: Transform
+    anchored: true
+  - type: Physics
+    bodyType: Static
+    canCollide: false
+  - type: Sprite
+    drawdepth: SmallObjects
+    sprite: CMU14/Structures/Machines/Employment/govfor.rsi
+    noRot: true
+    layers:
+    - state: off
+      map: ["enum.CMUEmploymentVisuals.State"]
+  - type: Appearance
+  - type: CMUEmploymentVisual
+  - type: Rotatable
+    rotateWhileAnchored: true
+  - type: Clickable
+  - type: InteractionOutline
+  - type: ApcPowerReceiver
+    powerLoad: 100
+  - type: RMCPowerReceiver
+    idleLoad: 10
+    activeLoad: 100
+    channel: Equipment
+  - type: ActivatableUI
+    key: enum.CMUEmploymentUiKey.Key
+  - type: UserInterface
+    interfaces:
+      enum.CMUEmploymentUiKey.Key:
+        type: CMUEmploymentBui
+  - type: ContainerContainer
+    containers:
+      CMUEmploymentOperator: !type:ContainerSlot
+      CMUEmploymentTarget: !type:ContainerSlot
+  - type: InteractedBlacklist
+    blacklist:
+      components:
+      - Xeno
+
+- type: entity
+  parent: CMUEmploymentConsoleBase
+  id: CMUEmploymentConsoleGovfor
+  name: GOVFOR employment console
+  suffix: Prototype
+  description: Programs GOVFOR employment credentials, door access and identification codes.
+  components:
+  - type: Sprite
+    sprite: CMU14/Structures/Machines/Employment/govfor.rsi
+  - type: CMUEmploymentConsole
+    requiredAccess: AU14AccessGovforCommand
+    faction: GOVFOR
+    heading: cmu-employment-heading-govfor
+    theme: Govfor
+    formPrototype: CMUPaperBase
+    govforProfiles:
+      USCM:
+        brand: cmu-employment-govfor-uscm
+        sprite: CMU14/Structures/Machines/Employment/govfor.rsi
+        paper: CMUPaperUSCM
+        accent: '#9CBF6E'
+        background: '#090D07'
+        surface: '#151E10'
+      LACN:
+        brand: cmu-employment-govfor-lacn
+        sprite: CMU14/Structures/Machines/Employment/lacn.rsi
+        paper: CMUPaperFlagUA
+        accent: '#B5D777'
+        background: '#0B1007'
+        surface: '#1C2612'
+      UPP:
+        brand: cmu-employment-govfor-upp
+        sprite: CMU14/Structures/Machines/Employment/upp.rsi
+        paper: CMUPaperUPP
+        accent: '#ED9C91'
+        background: '#130909'
+        surface: '#2C1514'
+      BEAR:
+        brand: cmu-employment-govfor-bear
+        sprite: CMU14/Structures/Machines/Employment/upp.rsi
+        paper: CMUPaperUPP
+        accent: '#ED9C91'
+        background: '#130909'
+        surface: '#2C1514'
+      RMC:
+        brand: cmu-employment-govfor-rmc
+        sprite: CMU14/Structures/Machines/Employment/rmc.rsi
+        paper: CMUPaperTWE
+        accent: '#99CFF4'
+        background: '#080D15'
+        surface: '#142334'
+      WEYU:
+        brand: cmu-employment-govfor-weyu
+        sprite: CMU14/Structures/Machines/Employment/weyland.rsi
+        paper: CMUPaperPMCWEYLAND
+        accent: '#FFB547'
+        background: '#120A02'
+        surface: '#291A08'
+      CMBCIU:
+        brand: cmu-employment-govfor-cmbciu
+        sprite: CMU14/Structures/Machines/Employment/cmb.rsi
+        paper: CMUPaperCMB
+        accent: '#B9D5EA'
+        background: '#0C1116'
+        surface: '#1A2935'
+      HAZOPS:
+        brand: cmu-employment-govfor-hazops
+        sprite: CMU14/Structures/Machines/Employment/hazops.rsi
+        paper: CMUPaperFlagUA
+        accent: '#E7C579'
+        background: '#120E05'
+        surface: '#2B2410'
+      VAIPO:
+        brand: cmu-employment-govfor-vaipo
+        sprite: CMU14/Structures/Machines/Employment/vaipo.rsi
+        paper: CMUPaperVAI
+        accent: '#C1B2E8'
+        background: '#100D17'
+        surface: '#251C33'
+      ProdigySF:
+        brand: cmu-employment-govfor-prodigysf
+        sprite: CMU14/Structures/Machines/Employment/prodigy.rsi
+        paper: CMUPaperBase
+        accent: '#DFB5A8'
+        background: '#130E0C'
+        surface: '#291C17'
+    allowedAccess:
+    - AU14AccessGovfor
+    - AU14AccessGovforSquad
+    - AU14AccessGovforSquadWeaponsSpecialist
+    - AU14AccessGovforCommand
+    - AU14AccessGovforSecurity
+    - AU14AccessGovforMedical
+    - AU14AccessGovforEngineering
+    - AU14AccessGovforFTL
+    - AU14AccessGovforGunner
+    - AU14AccessGovforPilot
+    - AU14AccessGovforJuniorOfficer
+    - AU14AccessGovforReq
+    - AU14AccessGovforVehicleCrew
+    - CMUAccessKitchen
+    - RMCAccessCommand
+    - RMCAccessSeniorCommand
+    - CMAccessGovforCommand
+    - CMAccessBrig
+    - CMAccessArmory
+    - CMAccessMedPrep
+    - CMAccessMedical
+    - CMAccessChemistry
+    - CMAccessMarineRifleman
+    - CMAccessMarinePrep
+    - CMAccessSmartPrep
+    - CMAccessSquadLeaderPrep
+    - CMAccessDropship
+    - CMAccessPilot
+    - CMAccessCrewman
+    - CMAccessRequisitions
+    - RMCAccessVehicleCrew
+    - CMAccessEngineering
+    - CMAccessMaint
+    - CMAccessOT
+    - RMCAccessMorgue
+    - CMAccessKitchen
+    - CMAccessSpecPrep
+    restrictedAccess:
+    - AU14AccessGovforSquad
+    - AU14AccessGovforSquadWeaponsSpecialist
+    - AU14AccessGovforCommand
+    - AU14AccessGovforSecurity
+    - AU14AccessGovforFTL
+    - AU14AccessGovforGunner
+    - AU14AccessGovforPilot
+    - AU14AccessGovforJuniorOfficer
+    - AU14AccessGovforVehicleCrew
+    - RMCAccessCommand
+    - RMCAccessSeniorCommand
+    - CMAccessGovforCommand
+    - CMAccessBrig
+    - CMAccessArmory
+    - CMAccessChemistry
+    - CMAccessMarineRifleman
+    - CMAccessMarinePrep
+    - CMAccessSmartPrep
+    - CMAccessSquadLeaderPrep
+    - CMAccessDropship
+    - CMAccessPilot
+    - CMAccessCrewman
+    - RMCAccessVehicleCrew
+    - CMAccessOT
+    - CMAccessSpecPrep
+    jobIcons:
+      AU14JobIconGovRifleman: cmu-employment-icon-au14jobicongovrifleman
+      AU14JobIconAFN: cmu-employment-icon-au14jobiconafn
+      AU14JobIconRFN: cmu-employment-icon-au14jobiconrfn
+      AU14JobIconGovWeaponsSpecialist: cmu-employment-icon-au14jobicongovweaponsspecialist
+      AU14JobIconCorpsman: cmu-employment-icon-au14jobiconcorpsman
+      AU14JobIconDoctor: cmu-employment-icon-au14jobicondoctor
+      AU14JobIconAuxTech: cmu-employment-icon-au14jobiconauxtech
+      AU14JobIconGovCT: cmu-employment-icon-au14jobicongovct
+      AU14JobIconMP: cmu-employment-icon-au14jobiconmp
+      AU14JobIconFTL: cmu-employment-icon-au14jobiconftl
+      AU14JobIconSquadSgt: cmu-employment-icon-au14jobiconsquadsgt
+      AU14JobIconPlatoonSgt: cmu-employment-icon-au14jobiconplatoonsgt
+      AU14JobIconRTO: cmu-employment-icon-au14jobiconrto
+      AU14JobIconPilotOfficer: cmu-employment-icon-au14jobiconpilotofficer
+      AU14JobIconDCC: cmu-employment-icon-au14jobicondcc
+      AU14JobIconGovTankCrewman: cmu-employment-icon-au14jobicongovtankcrewman
+      AU14JobIconGovTankCommander: cmu-employment-icon-au14jobicongovtankcommander
+      AU14JobIconOpsOfc: cmu-employment-icon-au14jobiconopsofc
+      AU14JobIconGovEO: cmu-employment-icon-au14jobicongoveo
+      AU14JobIconGovIO: cmu-employment-icon-au14jobicongovio
+      AU14JobIconGovCMP: cmu-employment-icon-au14jobicongovcmp
+      AU14JobIconGovMO: cmu-employment-icon-au14jobicongovmo
+      AU14JobIconGovLO: cmu-employment-icon-au14jobicongovlo
+      AU14JobIconGovAdjutant: cmu-employment-icon-au14jobicongovadjutant
+      AU14JobIconGovAdvisor: cmu-employment-icon-au14jobicongovadvisor
+      AU14JobIconPlatCo: cmu-employment-icon-au14jobiconplatco
+    defaultJobIcon: AU14JobIconGovRifleman
+    presets:
+    - name: cmu-employment-preset-visitor
+      jobTitle: cmu-employment-title-visitor
+      access:
+      - AU14AccessGovfor
+    - name: cmu-employment-preset-rifleman
+      jobIcon: AU14JobIconGovRifleman
+      jobTitle: cmu-employment-title-rifleman
+      access:
+      - AU14AccessGovfor
+      - AU14AccessGovforSquad
+    - name: cmu-employment-preset-engineering
+      jobIcon: AU14JobIconGovCT
+      jobTitle: cmu-employment-title-engineering
+      access:
+      - AU14AccessGovfor
+      - AU14AccessGovforEngineering
+      - CMAccessEngineering
+      - CMAccessMaint
+    - name: cmu-employment-preset-medical
+      jobIcon: AU14JobIconCorpsman
+      jobTitle: cmu-employment-title-medical
+      access:
+      - AU14AccessGovfor
+      - AU14AccessGovforMedical
+      - CMAccessMedical
+      - CMAccessMedPrep
+    - name: cmu-employment-preset-logistics
+      jobIcon: AU14JobIconAuxTech
+      jobTitle: cmu-employment-title-logistics
+      access:
+      - AU14AccessGovfor
+      - AU14AccessGovforReq
+      - CMAccessRequisitions
+    - name: cmu-employment-preset-security
+      jobIcon: AU14JobIconMP
+      jobTitle: cmu-employment-title-security
+      access:
+      - AU14AccessGovfor
+      - AU14AccessGovforSquad
+      - AU14AccessGovforSecurity
+      - CMAccessBrig
+    - name: cmu-employment-preset-pilot
+      jobIcon: AU14JobIconPilotOfficer
+      jobTitle: cmu-employment-title-pilot
+      access:
+      - AU14AccessGovfor
+      - AU14AccessGovforPilot
+      - CMAccessPilot
+      - CMAccessDropship
+    - name: cmu-employment-preset-vehicle
+      jobIcon: AU14JobIconGovTankCrewman
+      jobTitle: cmu-employment-title-vehicle
+      access:
+      - AU14AccessGovfor
+      - AU14AccessGovforVehicleCrew
+      - CMAccessCrewman
+      - RMCAccessVehicleCrew
+    - name: cmu-employment-preset-weapons
+      jobIcon: AU14JobIconGovWeaponsSpecialist
+      jobTitle: cmu-employment-title-weapons
+      access:
+      - AU14AccessGovfor
+      - AU14AccessGovforSquad
+      - AU14AccessGovforSquadWeaponsSpecialist
+      - CMAccessSpecPrep
+
+- type: entity
+  parent: CMUEmploymentConsoleBase
+  id: CMUEmploymentConsoleColony
+  name: colony employment console
+  suffix: Prototype
+  description: Programs colony employment credentials, door access and identification codes.
+  components:
+  - type: Sprite
+    sprite: CMU14/Structures/Machines/Employment/colony.rsi
+  - type: CMUEmploymentConsole
+    requiredAccess: AU14AccessColonyAdministrator
+    faction: FactionSurvivor
+    heading: cmu-employment-heading-colony
+    theme: Colony
+    formPrototype: CMUPaperSEEGSON
+    allowedAccess:
+    - CMAccessColonyPublic
+    - CMAccessColonyEngineering
+    - CMAccessColonyLogistics
+    - CMAccessColonyMedbay
+    - CMAccessColonyChem
+    - CMAccessColonyResearch
+    - CMAccessColonyBrig
+    - CMAccessColonyArmory
+    - CMAccessColonyCommand
+    - AU14AccessShopkeep
+    - CMAccessMedical
+    - CMAccessResearch
+    - CMAccessRequisitions
+    - AUAccessPrison
+    - AU14AccessOrbitalManagement
+    - AU14AccessOrbitalLaw
+    - AU14AccessColonyHeadPhysician
+    - AU14AccessColonyHeadEngineer
+    - AU14AccessColonyMarshall
+    - AU14AccessColonyForeman
+    - AU14AccessColonyAdministrator
+    - AU14AccessColonyHeadOfService
+    restrictedAccess:
+    - CMAccessColonyChem
+    - CMAccessColonyResearch
+    - CMAccessColonyBrig
+    - CMAccessColonyArmory
+    - CMAccessColonyCommand
+    - CMAccessResearch
+    - CMAccessRequisitions
+    - AUAccessPrison
+    - AU14AccessOrbitalManagement
+    - AU14AccessOrbitalLaw
+    - AU14AccessColonyHeadPhysician
+    - AU14AccessColonyHeadEngineer
+    - AU14AccessColonyMarshall
+    - AU14AccessColonyForeman
+    - AU14AccessColonyAdministrator
+    - AU14AccessColonyHeadOfService
+    accessNames:
+      CMAccessColonyChem: cmu-employment-access-colony-chemistry
+    presets:
+    - name: cmu-employment-preset-visitor
+      jobTitle: cmu-employment-title-visitor
+      access:
+      - CMAccessColonyPublic
+    - name: cmu-employment-preset-engineering
+      jobTitle: cmu-employment-title-engineering
+      access:
+      - CMAccessColonyPublic
+      - CMAccessColonyEngineering
+      - CMAccessColonyLogistics
+    - name: cmu-employment-preset-medical
+      jobTitle: cmu-employment-title-medical
+      access:
+      - CMAccessColonyPublic
+      - CMAccessColonyMedbay
+      - CMAccessColonyChem
+      - CMAccessMedical
+    - name: cmu-employment-preset-logistics
+      jobTitle: cmu-employment-title-logistics
+      access:
+      - CMAccessColonyPublic
+      - CMAccessColonyLogistics
+    - name: cmu-employment-preset-research
+      jobTitle: cmu-employment-title-research
+      access:
+      - CMAccessColonyPublic
+      - CMAccessColonyResearch
+      - CMAccessResearch
+    - name: cmu-employment-preset-security
+      jobTitle: cmu-employment-title-security
+      access:
+      - CMAccessColonyPublic
+      - CMAccessColonyBrig
+    - name: cmu-employment-preset-shopkeeper
+      jobTitle: cmu-employment-title-shopkeeper
+      access:
+      - CMAccessColonyPublic
+      - AU14AccessShopkeep
+
+- type: entity
+  parent: CMUEmploymentConsoleBase
+  id: CMUEmploymentConsoleWeyland
+  name: Weyland-Yutani employment console
+  suffix: Prototype
+  description: Programs Company employment credentials, door access and identification codes.
+  components:
+  - type: Sprite
+    sprite: CMU14/Structures/Machines/Employment/weyland.rsi
+  - type: CMUEmploymentConsole
+    requiredAccess: CMUAccessWeylandPersonnel
+    faction: FactionWEYU
+    heading: cmu-employment-heading-weyland
+    theme: Weyland
+    formPrototype: CMUPaperWEYLAND
+    allowedAccess:
+    - CMAccessColonyPublic
+    - AU14AccessCorporateWEYU
+    - AU14AccessCorporateWEYUFlight
+    - AU14AccessCorporateWEYULiaison
+    restrictedAccess:
+    - AU14AccessCorporateWEYUFlight
+    - AU14AccessCorporateWEYULiaison
+    accessNames:
+      AU14AccessCorporateWEYU: cmu-employment-access-corporate
+      AU14AccessCorporateWEYUFlight: cmu-employment-access-corporate-flight
+      AU14AccessCorporateWEYULiaison: cmu-employment-access-corporate-liaison
+    jobIcons:
+      AU14JobIconCorporateAssistant: cmu-employment-icon-au14jobiconcorporateassistant
+      CMJobIconLiaison: cmu-employment-icon-cmjobiconliaison
+      RMCJobIconPMCScientist: cmu-employment-icon-rmcjobiconpmcscientist
+      RMCJobIconPMCGoonStandard: cmu-employment-icon-rmcjobiconpmcgoonstandard
+      RMCJobIconPMCMedic: cmu-employment-icon-rmcjobiconpmcmedic
+      CMJobIconExecSpec: cmu-employment-icon-cmjobiconexecspec
+      CMJobIconExecSuper: cmu-employment-icon-cmjobiconexecsuper
+      CMJobIconExecAssMan: cmu-employment-icon-cmjobiconexecassman
+      CMJobIconExecDivMan: cmu-employment-icon-cmjobiconexecdivman
+      CMJobIconExecChief: cmu-employment-icon-cmjobiconexecchief
+      CMJobIconDepDirector: cmu-employment-icon-cmjobicondepdirector
+      CMJobIconDirector: cmu-employment-icon-cmjobicondirector
+    defaultJobIcon: AU14JobIconCorporateAssistant
+    presets:
+    - name: cmu-employment-preset-contractor
+      jobTitle: cmu-employment-title-contractor
+      access:
+      - CMAccessColonyPublic
+      - AU14AccessCorporateWEYU
+    - name: cmu-employment-preset-corporate-flight
+      jobTitle: cmu-employment-title-corporate-flight
+      access:
+      - CMAccessColonyPublic
+      - AU14AccessCorporateWEYU
+      - AU14AccessCorporateWEYUFlight
+    - name: cmu-employment-preset-liaison
+      jobIcon: CMJobIconLiaison
+      jobTitle: cmu-employment-title-liaison
+      access:
+      - CMAccessColonyPublic
+      - AU14AccessCorporateWEYU
+      - AU14AccessCorporateWEYULiaison
+
+- type: entity
+  parent: CMIDCardBase
+  id: CMUEmploymentBlankId
+  categories: []
+  name: blank employment ID
+  description: An unregistered ID card for issuing employment credentials.
+
+- type: accessLevel
+  id: CMUAccessWeylandPersonnel
+  name: cmu-employment-weyland-personnel-access
+
+- type: entity
+  parent: CMIDCardBase
+  id: CMUEmploymentWeylandOperatorId
+  categories: []
+  name: Company personnel authorization ID
+  suffix: Prototype
+  components:
+  - type: Access
+    tags: [CMUAccessWeylandPersonnel]
+
+- type: entity
+  parent: CMIDCardBase
+  id: CMUEmploymentGovforOperatorId
+  categories: []
+  name: GOVFOR personnel authorization ID
+  suffix: Prototype
+  components:
+  - type: Access
+    tags: [AU14AccessGovforCommand]
+
+- type: entity
+  parent: CMIDCardBase
+  id: CMUEmploymentColonyOperatorId
+  categories: []
+  name: colony personnel authorization ID
+  suffix: Prototype
+  components:
+  - type: Access
+    tags: [AU14AccessColonyAdministrator]
