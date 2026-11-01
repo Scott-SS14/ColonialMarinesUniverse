@@ -13,6 +13,9 @@ public sealed class CMUEmploymentBui(EntityUid owner, Enum uiKey) : BoundUserInt
         _window = this.CreateWindow<CMUEmploymentWindow>();
         _window.OnSlot += slot => SendMessage(new CMUEmploymentSlotMessage(slot));
         _window.OnApply += request => SendMessage(request);
+        _window.OnColony += request => SendMessage(request);
+        _window.OnPayroll += request => SendMessage(request);
+        _window.OnOffice += request => SendMessage(request);
         _window.OnRefresh += () => SendMessage(new CMUEmploymentRefreshMessage());
         SendMessage(new CMUEmploymentRefreshMessage());
     }

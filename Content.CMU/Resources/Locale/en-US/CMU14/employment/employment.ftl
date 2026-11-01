@@ -1,7 +1,7 @@
-cmu-employment-window = Employment credentials
-cmu-employment-heading-govfor = GOVFOR // PERSONNEL AUTHORIZATION
-cmu-employment-heading-colony = SEEGSON // COLONY EMPLOYMENT
-cmu-employment-heading-weyland = WEYLAND-YUTANI // PERSONNEL AUTHORIZATION
+cmu-employment-window = Department management
+cmu-employment-heading-govfor = GOVFOR // DEPARTMENT MANAGEMENT
+cmu-employment-heading-colony = SEEGSON // DEPARTMENT MANAGEMENT
+cmu-employment-heading-weyland = WEYLAND-YUTANI // DEPARTMENT MANAGEMENT
 cmu-employment-name = Registered name
 cmu-employment-title = New job title
 cmu-employment-presets = Credential presets
@@ -209,3 +209,198 @@ cmu-employment-govfor-cmbciu = COLONIAL MARSHAL BUREAU
 cmu-employment-govfor-hazops = HAZOPS
 cmu-employment-govfor-vaipo = VANGUARD'S ARROW
 cmu-employment-govfor-prodigysf = PRODIGY SECURITY
+
+cmu-employment-model = PERS / 03
+cmu-employment-cabinet-caption = PERSONNEL ADMINISTRATION • AUTHORIZED USE ONLY
+cmu-employment-power-on = ● POWER
+cmu-employment-power-off = ○ OFFLINE
+cmu-employment-printer-ready = DOCUMENT OUTPUT
+cmu-employment-printer-working = PRINTING RECORD...
+cmu-employment-boot-skip = Continue
+cmu-employment-boot-memory = MEMORY CHECK ................ OK
+cmu-employment-boot-readers = ID INTERFACE ................ OK
+cmu-employment-boot-ready = PERSONNEL SERVICES .......... READY
+
+cmu-employment-preview = Review credentials
+cmu-employment-preview-back = Back to editor
+cmu-employment-diff-heading = ACCESS TAG COMPARISON
+cmu-employment-diff-summary = +{ $added } added / −{ $removed } removed / { $kept } kept
+cmu-employment-diff-added = TO BE ADDED
+cmu-employment-diff-removed = TO BE REMOVED
+cmu-employment-diff-kept = UNCHANGED
+cmu-employment-diff-hint = This compares access tags. Existing group permissions and card-based IFF are also replaced. Nothing changes until confirmed.
+cmu-employment-card-draft = CREDENTIAL PREVIEW / DRAFT
+cmu-employment-card-revoked = REVOCATION PREVIEW
+cmu-employment-card-iff = Employer IFF authorized
+cmu-employment-card-no-iff = No employer card IFF
+cmu-employment-design-govfor = CONTROLLED PERSONNEL RECORD. Verify the bearer and assignment before issuing credentials.
+cmu-employment-design-colony = CIVIL REGISTRY SERVICES. Department permissions apply to the inserted ID card.
+cmu-employment-design-weyland = WEYLAND-YUTANI. Authorized personnel only. Building Better Worlds.
+cmu-employment-reader-empty = No card inserted
+cmu-employment-stage-insert = 01 / INSERT ID
+cmu-employment-stage-read = 01 / ID LOADED
+cmu-employment-stage-draft = 02 / REVIEW DRAFT
+cmu-employment-stage-waiting = 02 / AWAITING SERVER
+cmu-employment-stage-saved = 02 / ID WRITTEN
+cmu-employment-stage-output = 03 / DOCUMENT OUT
+cmu-employment-stage-printing = 03 / PRINTING
+cmu-employment-stage-printed = 03 / RECORD PRINTED
+cmu-employment-stamp-issued = CREDENTIALS ISSUED
+cmu-employment-stamp-updated = CREDENTIALS UPDATED
+cmu-employment-stamp-revoked = CREDENTIALS REVOKED
+cmu-employment-stamp-printed = PERSONNEL RECORD PRINTED
+
+cmu-employment-model-govfor = PERS-03 / CONTROLLED
+cmu-employment-model-colony = REG-03 / CIVIL SERVICES
+cmu-employment-model-weyland = HR-03 / COMPANY NETWORK
+
+cmu-employment-app-personnel = Personnel
+cmu-employment-app-manifest = Manifest
+cmu-employment-app-comms = Communications
+cmu-employment-app-payroll = Payroll
+cmu-employment-manifest-hint = Station records are grouped by the existing manifest system. Department rosters and payroll use the department consoles' registered ID cards.
+cmu-employment-manifest-load = Insert an authorized operator ID and select Refresh.
+cmu-employment-manifest-updated = Last refreshed: { $time }
+cmu-employment-manifest-station = Station manifest
+cmu-employment-manifest-empty = No station manifest is available. The terminal must belong to a station with personnel records. Department rosters may still be available.
+cmu-employment-department-button = { $name } ({ $count })
+cmu-employment-department-member = { $name } — { $title }
+cmu-employment-department-empty = No registered employees.
+cmu-employment-comms-hint = Uses the colony's existing announcement channel and emergency sirens. Announcements retain the normal recipient filtering.
+cmu-employment-broadcast-caption = Colony announcement
+cmu-employment-broadcast-placeholder = Enter an announcement (up to 512 characters)...
+cmu-employment-broadcast-count = { $count } / 512 characters
+cmu-employment-broadcast-confirm = I confirm this colony-wide announcement.
+cmu-employment-comms-access-hint = Communications also require Colony Command access on the inserted operator ID. Announcements have a 10-second delay between sends.
+cmu-employment-comms-denied = Colony Command access is required on the operator ID.
+cmu-employment-comms-cooldown = Please wait before using communications again.
+cmu-employment-comms-invalid = Enter a plain-text announcement between 1 and 512 characters.
+cmu-employment-comms-sent = Colony announcement sent.
+cmu-employment-siren-confirm = I confirm this change to the colony sirens.
+cmu-employment-siren-active = EMERGENCY SIREN: ACTIVE
+cmu-employment-siren-inactive = EMERGENCY SIREN: INACTIVE
+cmu-employment-siren-start = Activate emergency sirens
+cmu-employment-siren-stop = Silence emergency sirens
+cmu-employment-payroll-heading = DEPARTMENTS & PAYROLL
+cmu-employment-payroll-hint = Payments use the existing department budgets, income tax and ID balances. Underfunded departments are skipped. Payouts have a 10-second delay. Salary and funding inputs accept 0–1,000,000 credits.
+cmu-employment-payroll-default = Department default salary
+cmu-employment-payroll-individual = Selected employee salary
+cmu-employment-payroll-funding = Transfer funds from the colony budget
+cmu-employment-payroll-set-default = Set default
+cmu-employment-payroll-set-individual = Set salary
+cmu-employment-payroll-clear = Use default
+cmu-employment-payroll-fund = Fund department
+cmu-employment-payroll-transfer = Transfer inserted employee ID into this department
+cmu-employment-payroll-confirm = I confirm the selected department, employee and operation.
+cmu-employment-payroll-pay-employee = Pay selected employee
+cmu-employment-payroll-pay-department = Disburse department payroll
+cmu-employment-payroll-pay-colony = Disburse all colony payroll
+cmu-employment-payroll-budget = Department budget: ${ $amount }
+cmu-employment-payroll-employee = { $name } — ${ $salary } ({ $mode })
+cmu-employment-payroll-override = override
+cmu-employment-payroll-default-mode = default
+cmu-employment-payroll-stale = The department data changed. Review the refreshed list before continuing.
+cmu-employment-payroll-cooldown = Please wait before disbursing another payment.
+cmu-employment-payroll-failed = No change was made. Check the employee, salary and department funds, then refresh.
+cmu-employment-payroll-applied = Department operation processed. Payroll balances have been refreshed.
+
+cmu-employment-role-constable = Constable
+cmu-employment-role-deputy = Deputy
+cmu-employment-role-security-officer = Security officer
+cmu-employment-role-physician = Physician
+cmu-employment-role-nurse = Nurse
+cmu-employment-role-pharmacist = Pharmacist
+cmu-employment-role-engineer = Engineer
+cmu-employment-role-maintenance-technician = Maintenance technician
+cmu-employment-role-cargo-technician = Cargo technician
+cmu-employment-role-dock-worker = Dock worker
+cmu-employment-role-chef = Chef
+cmu-employment-role-bartender = Bartender
+cmu-employment-role-janitor = Janitor
+cmu-employment-role-botanist = Botanist
+cmu-employment-role-farm-worker = Farm worker
+cmu-employment-role-lumber-worker = Lumber worker
+cmu-employment-role-machine-operator = Machine operator
+cmu-employment-role-civilian-contractor = Civilian contractor
+cmu-employment-role-clerk = Clerk
+cmu-employment-role-administrative-clerk = Administrative clerk
+
+cmu-employment-office-heading = DEPARTMENT MANAGEMENT
+cmu-employment-office-services = Public services
+cmu-employment-office-requests = Requests & approvals
+cmu-employment-office-jail = Custody records
+cmu-employment-security-brand = { $force } / DEPARTMENT MANAGEMENT
+cmu-employment-department-brand = { $name } / DEPARTMENT MANAGEMENT
+cmu-employment-request-submitted = REQUEST SUBMITTED
+cmu-employment-request-hiring = { $action }: { $title }. Proposed access: { $permissions }. Employer IFF: { $iff }. Enrollment in the requesting department is included.
+cmu-employment-request-payroll = Department operation: { $action }. Amount: { $amount }. Current budgets, salaries and membership must still match when approved.
+cmu-employment-office-busy = The printer or request desk is busy. Please wait before submitting again.
+cmu-employment-office-full = The active request or custody ledger is full.
+cmu-employment-office-paper-description = An administrative request. Approval requires the Colony Administrator's stamp and the matching server-held request.
+cmu-employment-office-stamp-required = Insert the matching request paper bearing the Colony Administrator's stamp.
+cmu-employment-office-id-required = Insert the matching employee ID. Its credentials must still match the submitted request.
+cmu-employment-office-document =
+    {"["}head=2]DEPARTMENT MANAGEMENT REQUEST[/head]
+    Reference: { $reference }
+    Submitted: { $time }
+    Department: { $department }
+    Requested by: { $requester }
+    Subject: { $subject }
+
+    { $description }
+
+    No change takes effect until approved. The Colony Administrator must stamp this form and insert it at an administrator terminal. Hiring, editing, dismissal and transfer requests require the matching employee ID. Altered or already-decided requests cannot be applied.
+cmu-employment-request-status-pending = Pending approval
+cmu-employment-request-status-approved = Approved
+cmu-employment-request-status-rejected = Rejected
+cmu-employment-request-status-stale = Stale — resubmit
+cmu-employment-office-services-heading = IDENTIFICATION & PUBLIC SERVICES
+cmu-employment-office-services-hint = Insert your named ID in the operator reader to submit a report or service request. Hiring and management tools require the department leader's access. Officer custody records remain restricted.
+cmu-employment-office-report-placeholder = Describe your report or request (up to 512 characters)...
+cmu-employment-office-report-send = Submit and print request
+cmu-employment-office-requests-heading = REQUESTS & APPROVALS
+cmu-employment-office-paper = Insert approval paper
+cmu-employment-office-paper-eject = Eject approval paper
+cmu-employment-office-confirm = I have reviewed the request and the matching document.
+cmu-employment-office-approve = Approve stamped request
+cmu-employment-office-reject = Reject request
+cmu-employment-office-reprint = Reprint request
+cmu-employment-office-no-requests = No requests are available for this ID or department.
+cmu-employment-office-identified = IDENTIFIED / { $name }
+cmu-employment-jail-heading = CUSTODY & SENTENCE REGISTER
+cmu-employment-jail-hint = Insert the inmate's ID in the employee reader. Enter the charges and sentence. Timers track the sentence; they do not lock or unlock cell doors. Time served still requires an officer to record release.
+cmu-employment-jail-minutes = Sentence in minutes (1–120)
+cmu-employment-jail-reason = Charges or release reason (up to 512 characters)...
+cmu-employment-jail-confirm = I confirm this custody entry and its reason.
+cmu-employment-jail-book = Book inserted inmate ID
+cmu-employment-jail-release = Record selected inmate's release
+cmu-employment-jail-invalid = Insert a named inmate ID and choose a sentence from 1 to 120 minutes.
+cmu-employment-jail-booking-paper = Custody booking record
+cmu-employment-jail-released = Released
+cmu-employment-jail-served = Time served — awaiting release
+cmu-employment-jail-time = Remaining: { $time }
+cmu-employment-jail-document =
+    {"["}head=2]CUSTODY BOOKING RECORD[/head]
+    Inmate: { $name }
+    Booking officer: { $officer }
+    Charges: { $charges }
+    Sentence: { $minutes } minutes
+    Due: { $due }
+
+    This record tracks the sentence and does not operate cell doors. Release must be recorded by an authorized officer.
+cmu-employment-payroll-action-transfer = Department transfer
+cmu-employment-payroll-action-defaultsalary = Department default salary
+cmu-employment-payroll-action-individualsalary = Individual salary
+cmu-employment-payroll-action-clearoverride = Remove salary override
+cmu-employment-payroll-action-payemployee = Employee payment
+cmu-employment-payroll-action-paydepartment = Department payroll
+cmu-employment-payroll-action-paycolony = Colony payroll
+cmu-employment-payroll-action-funddepartment = Department funding
+
+cmu-employment-office-duplicate = A pending request already exists for that card or department action.
+cmu-employment-request-employee = { $department } / { $name }
+
+cmu-employment-request-dismissal = Dismissal: clear this card's door permissions and employer IFF, reset its title and job marker, and remove it from department payroll.
+
+cmu-employment-office-submitted = Request submitted, printed and faxed to the Colony Administrator.
+cmu-employment-office-no-fax = Request submitted and printing. No administrator fax was found; deliver the paper by hand or have the administrator reprint it from the request list.

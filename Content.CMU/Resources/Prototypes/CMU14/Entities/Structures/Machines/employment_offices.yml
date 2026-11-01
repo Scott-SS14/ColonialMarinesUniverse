@@ -1,0 +1,346 @@
+- type: entity
+  parent: CMUEmploymentConsoleColony
+  id: CMUConstableTerminal
+  name: constable department management console
+  suffix: Prototype
+  description: A security desk with public ID services, department management and paperwork for the Colony
+    Administrator.
+  components:
+  - type: CMUEmploymentConsole
+    requiredAccess: AU14AccessColonyMarshall
+    heading: cmu-employment-office-heading
+    allowedAccess:
+    - CMAccessColonyPublic
+    - CMAccessColonyBrig
+    - CMAccessColonyArmory
+    restrictedAccess: []
+    accessNames: {}
+    jobIcons: {}
+    presets:
+    - name: cmu-employment-role-constable
+      jobTitle: cmu-employment-role-constable
+      access:
+      - CMAccessColonyPublic
+      - CMAccessColonyBrig
+      - CMAccessColonyArmory
+    - name: cmu-employment-role-deputy
+      jobTitle: cmu-employment-role-deputy
+      access:
+      - CMAccessColonyPublic
+      - CMAccessColonyBrig
+      - CMAccessColonyArmory
+    - name: cmu-employment-role-security-officer
+      jobTitle: cmu-employment-role-security-officer
+      access:
+      - CMAccessColonyPublic
+      - CMAccessColonyBrig
+      - CMAccessColonyArmory
+  - type: CMUEmploymentOffice
+    department: AU14DepartmentColonySecurity
+    publicDesk: true
+    securityBranding: true
+    jail: false
+    requiresApproval: true
+
+- type: entity
+  parent: CMUEmploymentConsoleColony
+  id: CMUJailTerminal
+  name: security jail management console
+  suffix: Prototype
+  description: An officer-operated custody register for booking inmates and tracking their sentences.
+  components:
+  - type: CMUEmploymentConsole
+    requiredAccess: CMAccessColonyBrig
+    heading: cmu-employment-office-heading
+    allowedAccess: []
+    restrictedAccess: []
+    accessNames: {}
+    jobIcons: {}
+    presets: []
+  - type: CMUEmploymentOffice
+    department: AU14DepartmentColonySecurity
+    publicDesk: false
+    securityBranding: true
+    jail: true
+    requiresApproval: false
+
+- type: entity
+  parent: CMUEmploymentConsoleColony
+  id: CMUHeadMedicalTerminal
+  name: medical department management console
+  suffix: Prototype
+  description: Manages medical personnel, department membership and payroll requests.
+  components:
+  - type: CMUEmploymentConsole
+    requiredAccess: AU14AccessColonyHeadPhysician
+    heading: cmu-employment-office-heading
+    allowedAccess:
+    - CMAccessColonyPublic
+    - CMAccessColonyMedbay
+    - CMAccessColonyChem
+    restrictedAccess: []
+    accessNames: {}
+    jobIcons: {}
+    presets:
+    - name: cmu-employment-role-physician
+      jobTitle: cmu-employment-role-physician
+      access:
+      - CMAccessColonyPublic
+      - CMAccessColonyMedbay
+      - CMAccessColonyChem
+    - name: cmu-employment-role-nurse
+      jobTitle: cmu-employment-role-nurse
+      access:
+      - CMAccessColonyPublic
+      - CMAccessColonyMedbay
+      - CMAccessColonyChem
+    - name: cmu-employment-role-pharmacist
+      jobTitle: cmu-employment-role-pharmacist
+      access:
+      - CMAccessColonyPublic
+      - CMAccessColonyMedbay
+      - CMAccessColonyChem
+  - type: CMUEmploymentOffice
+    department: AU14DepartmentColonyMedical
+    publicDesk: false
+    securityBranding: false
+    jail: false
+    requiresApproval: true
+
+- type: entity
+  parent: CMUEmploymentConsoleColony
+  id: CMUHeadEngineeringTerminal
+  name: engineering department management console
+  suffix: Prototype
+  description: Manages engineering personnel, department membership and payroll requests.
+  components:
+  - type: CMUEmploymentConsole
+    requiredAccess: AU14AccessColonyHeadEngineer
+    heading: cmu-employment-office-heading
+    allowedAccess:
+    - CMAccessColonyPublic
+    - CMAccessColonyEngineering
+    restrictedAccess: []
+    accessNames: {}
+    jobIcons: {}
+    presets:
+    - name: cmu-employment-role-engineer
+      jobTitle: cmu-employment-role-engineer
+      access:
+      - CMAccessColonyPublic
+      - CMAccessColonyEngineering
+    - name: cmu-employment-role-maintenance-technician
+      jobTitle: cmu-employment-role-maintenance-technician
+      access:
+      - CMAccessColonyPublic
+      - CMAccessColonyEngineering
+  - type: CMUEmploymentOffice
+    department: AU14DepartmentEngineering
+    publicDesk: false
+    securityBranding: false
+    jail: false
+    requiresApproval: true
+
+- type: entity
+  parent: CMUEmploymentConsoleColony
+  id: CMUHeadCargoTerminal
+  name: cargo department management console
+  suffix: Prototype
+  description: Manages cargo personnel, department membership and payroll requests.
+  components:
+  - type: CMUEmploymentConsole
+    requiredAccess: AU14AccessColonyForeman
+    heading: cmu-employment-office-heading
+    allowedAccess:
+    - CMAccessColonyPublic
+    - CMAccessColonyLogistics
+    restrictedAccess: []
+    accessNames: {}
+    jobIcons: {}
+    presets:
+    - name: cmu-employment-role-cargo-technician
+      jobTitle: cmu-employment-role-cargo-technician
+      access:
+      - CMAccessColonyPublic
+      - CMAccessColonyLogistics
+    - name: cmu-employment-role-dock-worker
+      jobTitle: cmu-employment-role-dock-worker
+      access:
+      - CMAccessColonyPublic
+      - CMAccessColonyLogistics
+  - type: CMUEmploymentOffice
+    department: AU14DepartmentLabor
+    publicDesk: false
+    securityBranding: false
+    jail: false
+    requiresApproval: true
+
+- type: entity
+  parent: CMUEmploymentConsoleColony
+  id: CMUHeadServicesTerminal
+  name: services department management console
+  suffix: Prototype
+  description: Manages services personnel, department membership and payroll requests.
+  components:
+  - type: CMUEmploymentConsole
+    requiredAccess: AU14AccessColonyHeadOfService
+    heading: cmu-employment-office-heading
+    allowedAccess:
+    - CMAccessColonyPublic
+    restrictedAccess: []
+    accessNames: {}
+    jobIcons: {}
+    presets:
+    - name: cmu-employment-role-chef
+      jobTitle: cmu-employment-role-chef
+      access:
+      - CMAccessColonyPublic
+    - name: cmu-employment-role-bartender
+      jobTitle: cmu-employment-role-bartender
+      access:
+      - CMAccessColonyPublic
+    - name: cmu-employment-role-janitor
+      jobTitle: cmu-employment-role-janitor
+      access:
+      - CMAccessColonyPublic
+  - type: CMUEmploymentOffice
+    department: AU14DepartmentServices
+    publicDesk: false
+    securityBranding: false
+    jail: false
+    requiresApproval: true
+
+- type: entity
+  parent: CMUEmploymentConsoleColony
+  id: CMUHeadHydroponicsTerminal
+  name: hydroponics department management console
+  suffix: Prototype
+  description: Manages hydroponics personnel, department membership and payroll requests.
+  components:
+  - type: CMUEmploymentConsole
+    requiredAccess: AU14AccessColonyHeadOfService
+    heading: cmu-employment-office-heading
+    allowedAccess:
+    - CMAccessColonyPublic
+    restrictedAccess: []
+    accessNames: {}
+    jobIcons: {}
+    presets:
+    - name: cmu-employment-role-botanist
+      jobTitle: cmu-employment-role-botanist
+      access:
+      - CMAccessColonyPublic
+    - name: cmu-employment-role-farm-worker
+      jobTitle: cmu-employment-role-farm-worker
+      access:
+      - CMAccessColonyPublic
+  - type: CMUEmploymentOffice
+    department: AU14DepartmentHydroponics
+    publicDesk: false
+    securityBranding: false
+    jail: false
+    requiresApproval: true
+
+- type: entity
+  parent: CMUEmploymentConsoleColony
+  id: CMUHeadLumbermillTerminal
+  name: lumbermill department management console
+  suffix: Prototype
+  description: Manages lumbermill personnel, department membership and payroll requests.
+  components:
+  - type: CMUEmploymentConsole
+    requiredAccess: AU14AccessColonyForeman
+    heading: cmu-employment-office-heading
+    allowedAccess:
+    - CMAccessColonyPublic
+    restrictedAccess: []
+    accessNames: {}
+    jobIcons: {}
+    presets:
+    - name: cmu-employment-role-lumber-worker
+      jobTitle: cmu-employment-role-lumber-worker
+      access:
+      - CMAccessColonyPublic
+    - name: cmu-employment-role-machine-operator
+      jobTitle: cmu-employment-role-machine-operator
+      access:
+      - CMAccessColonyPublic
+  - type: CMUEmploymentOffice
+    department: AU14DepartmentLumbermill
+    publicDesk: false
+    securityBranding: false
+    jail: false
+    requiresApproval: true
+
+- type: entity
+  parent: CMUEmploymentConsoleColony
+  id: CMUHeadCivilianTerminal
+  name: civilian department management console
+  suffix: Prototype
+  description: Manages civilian personnel, department membership and payroll requests.
+  components:
+  - type: CMUEmploymentConsole
+    requiredAccess: AU14AccessColonyHeadOfService
+    heading: cmu-employment-office-heading
+    allowedAccess:
+    - CMAccessColonyPublic
+    restrictedAccess: []
+    accessNames: {}
+    jobIcons: {}
+    presets:
+    - name: cmu-employment-role-civilian-contractor
+      jobTitle: cmu-employment-role-civilian-contractor
+      access:
+      - CMAccessColonyPublic
+    - name: cmu-employment-role-clerk
+      jobTitle: cmu-employment-role-clerk
+      access:
+      - CMAccessColonyPublic
+  - type: CMUEmploymentOffice
+    department: AU14DepartmentCivilian
+    publicDesk: false
+    securityBranding: false
+    jail: false
+    requiresApproval: true
+
+- type: entity
+  parent: CMUEmploymentConsoleColony
+  id: CMUHeadCommandTerminal
+  name: colony command department management console
+  suffix: Prototype
+  description: Manages colony command personnel, department membership and payroll requests.
+  components:
+  - type: CMUEmploymentConsole
+    requiredAccess: AU14AccessColonyAdministrator
+    heading: cmu-employment-office-heading
+    allowedAccess:
+    - CMAccessColonyPublic
+    - CMAccessColonyCommand
+    restrictedAccess: []
+    accessNames: {}
+    jobIcons: {}
+    presets:
+    - name: cmu-employment-role-administrative-clerk
+      jobTitle: cmu-employment-role-administrative-clerk
+      access:
+      - CMAccessColonyPublic
+      - CMAccessColonyCommand
+  - type: CMUEmploymentOffice
+    department: AU14DepartmentColonyCommand
+    publicDesk: false
+    securityBranding: false
+    jail: false
+    requiresApproval: false
+
+- type: entity
+  parent: CMUConstableTerminal
+  id: CMUSecurityManagementTerminal
+  name: security department management console
+  suffix: Generic, Prototype
+  description: A neutral security department management console for any colony security force.
+  components:
+  - type: CMUEmploymentConsole
+    logo: ''
+    formPrototype: CMUPaperBase
+  - type: CMUEmploymentOffice
+    securityBranding: false

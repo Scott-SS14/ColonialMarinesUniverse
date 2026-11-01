@@ -466,6 +466,14 @@ public sealed partial class DepartmentConsoleSystem : EntitySystem
 
         var idCardUid = args.Used;
 
+        MoveEmploymentMember(uid, comp, idCardUid);
+
+        var name = idCard.FullName ?? Loc.GetString("department-console-unknown");
+        _popup.PopupEntity(Loc.GetString("department-console-hired", ("name", name), ("department", comp.DepartmentName)), uid, args.User);
+    }
+
+    private void MoveEmploymentMember(EntityUid uid, DepartmentConsoleComponent comp, EntityUid idCardUid)
+    {
         // Remove from any other departments first
         var query = EntityQueryEnumerator<DepartmentConsoleComponent>();
         while (query.MoveNext(out var deptUid, out var dept))
@@ -482,8 +490,6 @@ public sealed partial class DepartmentConsoleSystem : EntitySystem
         GrantDepartmentAccess(idCardUid, comp);
         UpdateAllUiForDepartment(uid, comp);
 
-        var name = idCard.FullName ?? Loc.GetString("department-console-unknown");
-        _popup.PopupEntity(Loc.GetString("department-console-hired", ("name", name), ("department", comp.DepartmentName)), uid, args.User);
     }
 
     private void OnFire(EntityUid uid, DepartmentConsoleComponent comp, DepartmentConsoleFireBuiMsg msg)
@@ -691,11 +697,19 @@ public sealed partial class DepartmentConsoleSystem : EntitySystem
     /// </summary>
     public void DispenseSalaries()
     {
+        DispenseEmploymentPayroll(null, null);
+    }
+
+    private bool DispenseEmploymentPayroll(HashSet<EntityUid>? scope, EntityUid? recipient)
+    {
+        var paid = false;
         var announcements = new List<string>();
         var processedDepartments = new HashSet<string>();
         var deptQuery = EntityQueryEnumerator<DepartmentConsoleComponent>();
         while (deptQuery.MoveNext(out var deptUid, out var dept))
         {
+            if (scope != null && !scope.Contains(deptUid))
+                continue;
             // Skip if we already processed a console with this department ID
             // (multiple consoles share the same state)
             if (dept.DepartmentId != null && !processedDepartments.Add(dept.DepartmentId))
@@ -703,8 +717,11 @@ public sealed partial class DepartmentConsoleSystem : EntitySystem
 
             // Calculate total salary cost for this department
             var deptCost = 0f;
+            var eligible = 0;
             foreach (var idCardUid in dept.Members)
             {
+                if (recipient != null && idCardUid != recipient)
+                    continue;
                 if (!TryComp<IdCardComponent>(idCardUid, out var idCard)
                     || (idCard.OriginalOwner != null && HasComp<SynthComponent>(idCard.OriginalOwner)))
                     continue;
@@ -713,8 +730,11 @@ public sealed partial class DepartmentConsoleSystem : EntitySystem
                     ? overrideSalary
                     : dept.DefaultSalary;
                 deptCost += salary;
+                eligible++;
             }
 
+            if (scope != null && eligible == 0)
+                continue;
             // Skip this department if it can't afford its salaries
             if (deptCost > dept.DepartmentBudget)
             {
@@ -731,6 +751,8 @@ public sealed partial class DepartmentConsoleSystem : EntitySystem
             var totalTaxCollected = 0f;
             foreach (var idCardUid in dept.Members)
             {
+                if (recipient != null && idCardUid != recipient)
+                    continue;
                 if (!TryComp<IdCardComponent>(idCardUid, out var idCard)
                     || (idCard.OriginalOwner != null && HasComp<SynthComponent>(idCard.OriginalOwner)))
                     continue;
@@ -745,6 +767,7 @@ public sealed partial class DepartmentConsoleSystem : EntitySystem
 
                 // Credit the ID card balance with net salary (after tax)
                 idCard.AccountBalance += netSalary;
+                paid = true;
                 Dirty(idCardUid, idCard);
             }
 
@@ -778,6 +801,7 @@ public sealed partial class DepartmentConsoleSystem : EntitySystem
             //_chatSystem.DispatchGlobalAnnouncement(message, sender, true, announcementSound); // CMU14: xenos must not receive colony announcements
             _chatSystem.DispatchFilteredAnnouncement(ColonyAnnouncements.Recipients(EntityManager), message, sender: sender, playSound: true, announcementSound: announcementSound); // CMU14
         }
+        return paid;
     }
 
     /// <summary>
@@ -842,3 +866,4 @@ public sealed partial class DepartmentConsoleSystem : EntitySystem
         return result;
     }
 }
+

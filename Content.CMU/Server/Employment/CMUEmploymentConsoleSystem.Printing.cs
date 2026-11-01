@@ -71,6 +71,7 @@ public sealed partial class CMUEmploymentConsoleSystem
             _ => "cmu-employment-form-policy-weyland",
         });
         var reference = $"{GetNetEntity(ent.Owner)}-{ent.Comp.Revision:D4}";
+        job.UpdatesReceipt = true;
         job.Prototype = GetFormPrototype(ent);
         job.Issuer = actor;
         job.Remaining = float.IsFinite(ent.Comp.PrintDuration) ? Math.Clamp(ent.Comp.PrintDuration, 0.1f, 10f) : 2f;
@@ -116,6 +117,8 @@ public sealed partial class CMUEmploymentConsoleSystem
             if (!TerminatingOrDeleted(job.Issuer) && _blocker.CanInteract(job.Issuer, uid)
                 && _interaction.InRangeUnobstructed(job.Issuer, uid))
                 _hands.TryPickupAnyHand(job.Issuer, paper);
+            if (job.UpdatesReceipt && console.LastReceipt is { } receipt)
+                console.LastReceipt = new(receipt.Revision, receipt.Card, receipt.Action, receipt.Name, true, receipt.Pending);
             RemComp<CMUEmploymentPrintJobComponent>(uid);
             UpdateMachineVisuals((uid, console));
             UpdateUi((uid, console));

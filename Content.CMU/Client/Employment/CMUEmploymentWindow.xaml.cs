@@ -36,8 +36,15 @@ public sealed partial class CMUEmploymentWindow : DefaultWindow
     private Color _accent;
     private Color _background;
     private Color _surface;
+    private static readonly Color TextPrimary = Color.FromHex("#E1E3DB");
+    private static readonly Color TextSecondary = Color.FromHex("#9BA9AB");
+    private static readonly Color PanelEdge = Color.FromHex("#3B4A4E");
+    private static readonly Color WarningText = Color.FromHex("#DCA286");
     private bool _history;
     private bool _pending;
+    private bool _review;
+    private bool _updatingState;
+    private bool _previewDirty = true;
 
     public CMUEmploymentWindow()
     {
@@ -45,6 +52,11 @@ public sealed partial class CMUEmploymentWindow : DefaultWindow
         _font = IoCManager.Resolve<IResourceCache>().GetFont("/Fonts/RobotoMono/RobotoMono-Regular.ttf", 12);
         _prototypes = IoCManager.Resolve<IPrototypeManager>();
         _sprites = IoCManager.Resolve<IEntitySystemManager>().GetEntitySystem<SpriteSystem>();
+        InitializeHardware(IoCManager.Resolve<IResourceCache>());
+        InitializePresentation();
+        InitializeColony();
+        InitializePayroll();
+        InitializeOffices();
         Title = Loc.GetString("cmu-employment-window");
         OperationsCaption.Text = Loc.GetString("cmu-employment-operations");
         ReaderCaption.Text = Loc.GetString("cmu-employment-readers");
@@ -74,7 +86,9 @@ public sealed partial class CMUEmploymentWindow : DefaultWindow
         TerminateButton.OnPressed += _ => SetAction(CMUEmploymentAction.Terminate);
         HistoryButton.OnPressed += _ =>
         {
+            _colonyPage = 0;
             _history = !_history;
+            _review = false;
             Confirm.Pressed = false;
             UpdateActions();
         };
@@ -107,8 +121,14 @@ public sealed partial class CMUEmploymentWindow : DefaultWindow
 
     public void UpdateState(CMUEmploymentState state)
     {
+        if (TryUpdateColonyOnly(state))
+            return;
+        var previous = _state;
+        _updatingState = true;
+        _previewDirty = true;
         _state = state;
         _pending = false;
+        _payrollPending = false;
         _accent = state.Accent ?? Color.FromHex(state.Theme switch
         {
             CMUEmploymentTheme.Govfor => "#9CBF6E",
@@ -127,6 +147,8 @@ public sealed partial class CMUEmploymentWindow : DefaultWindow
             CMUEmploymentTheme.Colony => "#0B2115",
             _ => "#291A08",
         });
+        _background = Blend(Color.FromHex("#10171B"), _background, 0.3f);
+        _surface = Blend(Color.FromHex("#202B30"), _surface, 0.25f);
         Brand.Text = Loc.GetString(state.Theme switch
         {
             CMUEmploymentTheme.Govfor => "cmu-employment-brand-govfor",
@@ -214,17 +236,28 @@ public sealed partial class CMUEmploymentWindow : DefaultWindow
             HistoryList.AddChild(new Label { Text = entry, ToolTip = entry, ClipText = true });
         if (state.History.Count == 0)
             HistoryList.AddChild(new Label { Text = Loc.GetString("cmu-employment-history-empty") });
-        ApplyTheme(Screen);
+        ApplyTheme(Bezel);
         Bezel.PanelOverride = Box(Color.FromHex("#242725"), _accent, 2);
         Screen.PanelOverride = Box(_background, _accent, 1);
         foreach (var panel in new[] { NavigationPanel, IdentityPanel, PresetPanel, AccessPanel, HistoryFrame, ReviewPanel })
-            panel.PanelOverride = Box(_surface, _accent.WithAlpha(0.35f), 1);
-        HeaderPanel.PanelOverride = Box(_accent, _accent, 1);
+            panel.PanelOverride = Box(_surface, PanelEdge, 1);
+        HeaderPanel.PanelOverride = Box(Blend(_surface, _accent, 0.08f), PanelEdge, 1);
         IconChoices.StyleBoxOverride = Box(_background, _accent.WithAlpha(0.5f), 1);
-        Brand.FontColorOverride = _background;
-        Heading.FontColorOverride = _background;
+        Brand.FontColorOverride = TextPrimary;
+        Heading.FontColorOverride = TextSecondary;
+        foreach (var caption in new[] { NameCaption, TitleCaption, IconCaption, PresetCaption, AccessCaption })
+            caption.FontColorOverride = TextSecondary;
+        IffHint.FontColorOverride = TextSecondary;
+        Review.FontColorOverride = WarningText;
+        CurrentTitle.FontColorOverride = TextSecondary;
+        Status.FontColorOverride = !state.Powered ? WarningText
+            : state.Printing ? BusyLamp : state.Authenticated ? _accent : TextSecondary;
         ResetDraft();
         FilterAccess();
+        UpdateHardware();
+        _updatingState = false;
+        UpdatePresentation();
+        UpdateReceipt(previous);
     }
 
     private static StyleBoxFlat Box(Color background, Color border, int width) => new()
@@ -234,37 +267,53 @@ public sealed partial class CMUEmploymentWindow : DefaultWindow
         BorderThickness = new Thickness(width),
     };
 
+    private static Color Blend(Color a, Color b, float amount) => new(
+        a.R + (b.R - a.R) * amount,
+        a.G + (b.G - a.G) * amount,
+        a.B + (b.B - a.B) * amount,
+        1f);
+
     private void BindButton(Button button)
     {
         button.OnMouseEntered += _ =>
         {
             if (!button.Disabled)
-                button.StyleBoxOverride = Box(_surface, _accent, 1);
+                button.StyleBoxOverride = Box(Blend(_surface, _accent, 0.12f), _accent.WithAlpha(0.65f), 1);
         };
         button.OnMouseExited += _ => StyleButton(button);
     }
 
     private void StyleButton(Button button)
     {
-        var selected = button == HireButton && !_history && _action == CMUEmploymentAction.Hire
+        var selected = _colonyPage == 0 && (button == HireButton && !_history && _action == CMUEmploymentAction.Hire
             || button == EditButton && !_history && _action == CMUEmploymentAction.Edit
             || button == TerminateButton && !_history && _action == CMUEmploymentAction.Terminate
-            || button == HistoryButton && _history;
-        button.StyleBoxOverride = Box(selected ? _accent : _background,
-            _accent.WithAlpha(button.Disabled ? 0.2f : 0.6f), 1);
+            || button == HistoryButton && _history
+            || button == PreviewButton && _review)
+            || button == PersonnelApp && _colonyPage == 0 || button == ManifestApp && _colonyPage == 1
+            || button == CommunicationsApp && _colonyPage == 2 || button == PayrollApp && _colonyPage == 3
+            || button == OfficeRequestsApp && _colonyPage == 4 || button == OfficeServicesApp && _colonyPage == 5
+            || button == OfficeJailApp && _colonyPage == 6;
+        var destructive = button == TerminateButton || button == ApplyButton && _action == CMUEmploymentAction.Terminate;
+        var color = destructive ? WarningText : _accent;
+        var prominent = selected || button == ApplyButton && !button.Disabled;
+        button.StyleBoxOverride = Box(prominent ? Blend(_surface, color, 0.16f) : _background,
+            (prominent ? color : PanelEdge).WithAlpha(button.Disabled ? 0.35f : 0.8f), 1);
         button.Label.FontOverride = _font;
-        button.Label.FontColorOverride = (selected ? _background : _accent).WithAlpha(button.Disabled ? 0.4f : 1f);
+        button.Label.FontColorOverride = (prominent || destructive ? color : TextPrimary).WithAlpha(button.Disabled ? 0.35f : 1f);
     }
 
     private void ApplyTheme(Control control)
     {
+        if (ReferenceEquals(control, _manifest))
+            return;
         if (control is Label label)
         {
             label.FontOverride = _font;
-            label.FontColorOverride = _accent;
+            label.FontColorOverride = TextPrimary;
         }
         if (control is LineEdit field)
-            field.StyleBoxOverride = Box(_background, _accent.WithAlpha(0.5f), 1);
+            field.StyleBoxOverride = Box(_background, PanelEdge, 1);
         foreach (var child in control.Children)
             ApplyTheme(child);
         if (control is Button button)
@@ -273,8 +322,13 @@ public sealed partial class CMUEmploymentWindow : DefaultWindow
 
     private void SetAction(CMUEmploymentAction action)
     {
+        _colonyPage = 0;
         _action = action;
         _history = false;
+        _review = false;
+        _previewDirty = true;
+        if (!_updatingState)
+            _draftEdited = true;
         Confirm.Pressed = false;
         UpdateActions();
     }
@@ -298,10 +352,15 @@ public sealed partial class CMUEmploymentWindow : DefaultWindow
         foreach (var (tag, check) in _access)
             check.Pressed = state.CurrentAccess.Contains(tag);
         InvalidateDraft();
+        _draftEdited = false;
+        UpdatePresentation();
     }
 
     private void InvalidateDraft()
     {
+        _previewDirty = true;
+        if (!_updatingState)
+            _draftEdited = true;
         Confirm.Pressed = false;
         UpdateActions();
     }
@@ -326,7 +385,8 @@ public sealed partial class CMUEmploymentWindow : DefaultWindow
             return;
         var active = state.Powered && state.Authenticated && state.Target != null && !_pending && !state.Printing;
         var editing = active && !_history && _action != CMUEmploymentAction.Terminate;
-        Workspace.Visible = !_history;
+        Workspace.Visible = !_history && !_review;
+        DossierFrame.Visible = _review && !_history;
         HistoryFrame.Visible = _history;
         TitleField.Editable = editing;
         NameField.Editable = editing && state.Blank;
@@ -367,6 +427,9 @@ public sealed partial class CMUEmploymentWindow : DefaultWindow
             if (child is Button button)
                 StyleButton(button);
         }
+        UpdatePresentation();
+        UpdateColony();
+        UpdateOffices();
     }
 
     private static string Wrap(string text, int columns)

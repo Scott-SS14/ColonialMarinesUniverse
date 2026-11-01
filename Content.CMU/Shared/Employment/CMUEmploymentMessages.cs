@@ -72,11 +72,27 @@ public sealed class CMUEmploymentPresetOption(string name, string title, List<Pr
 }
 
 [Serializable, NetSerializable]
+public sealed class CMUEmploymentReceipt(int revision, NetEntity card, CMUEmploymentAction action, string name, bool printed = false, bool pending = false)
+{
+    public readonly bool Printed = printed;
+    public readonly bool Pending = pending;
+    public readonly int Revision = revision;
+    public readonly NetEntity Card = card;
+    public readonly CMUEmploymentAction Action = action;
+    public readonly string Name = name;
+}
+
+[Serializable, NetSerializable]
 public sealed class CMUEmploymentState : BoundUserInterfaceState
 {
     public string Heading = string.Empty;
     public CMUEmploymentTheme Theme;
     public string Brand = string.Empty;
+    public string Logo = string.Empty;
+    public CMUEmploymentColonyState? Colony;
+    public bool CanBroadcast;
+    public bool SirenActive;
+    public CMUEmploymentOfficeState? Office;
     public Color? Accent;
     public Color? Background;
     public Color? Surface;
@@ -86,6 +102,7 @@ public sealed class CMUEmploymentState : BoundUserInterfaceState
     public NetEntity? Operator;
     public string OperatorName = string.Empty;
     public bool OperatorCardInserted;
+    public string OperatorCardName = string.Empty;
     public NetEntity? Target;
     public string TargetName = string.Empty;
     public string JobTitle = string.Empty;
@@ -96,6 +113,7 @@ public sealed class CMUEmploymentState : BoundUserInterfaceState
     public bool LocalEmployee;
     public bool HasIff;
     public int Revision;
+    public CMUEmploymentReceipt? Receipt;
     public List<ProtoId<AccessLevelPrototype>> CurrentAccess = new();
     public List<CMUEmploymentAccessOption> Options = new();
     public List<CMUEmploymentPresetOption> Presets = new();

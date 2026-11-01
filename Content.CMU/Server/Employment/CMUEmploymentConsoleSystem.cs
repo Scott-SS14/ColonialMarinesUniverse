@@ -1,9 +1,11 @@
+using System.Linq;
 using Content.Shared.Access.Components;
 using Content.Shared.Access.Systems;
 using Content.Shared.Access;
 using Content.Shared.ActionBlocker;
 using Content.Shared.Administration.Logs;
 using Content.Shared.CMU14.Employment;
+using Content.Shared.CMU14.ColonyEconomy;
 using Content.Shared.Database;
 using Content.Shared.Hands.EntitySystems;
 using Content.Shared.Interaction;
@@ -40,6 +42,9 @@ public sealed partial class CMUEmploymentConsoleSystem : EntitySystem
             subs.Event<CMUEmploymentSlotMessage>(OnSlot);
             subs.Event<CMUEmploymentApplyMessage>(OnApply);
             subs.Event<CMUEmploymentRefreshMessage>(OnRefresh);
+            subs.Event<CMUEmploymentColonyMessage>(OnColonyMessage);
+            subs.Event<CMUEmploymentPayrollMessage>(OnPayrollMessage);
+            subs.Event<CMUEmploymentOfficeMessage>(OnOfficeMessage);
         });
         SubscribeLocalEvent<CMUEmploymentConsoleComponent, BoundUIOpenedEvent>(OnOpened);
         SubscribeLocalEvent<CMUEmploymentConsoleComponent, BoundUIClosedEvent>(OnClosed);
@@ -48,6 +53,8 @@ public sealed partial class CMUEmploymentConsoleSystem : EntitySystem
         SubscribeLocalEvent<CMUEmploymentConsoleComponent, PowerChangedEvent>(OnPower);
         SubscribeLocalEvent<CMUEmploymentConsoleComponent, ComponentStartup>(OnStartup);
         SubscribeLocalEvent<Content.Server.GameTicking.GameRunLevelChangedEvent>(OnRunLevelChanged);
+        SubscribeLocalEvent<CMUEmploymentSirenChangedEvent>(OnColonySirenChanged);
+        SubscribeLocalEvent<Content.Shared.GameTicking.RoundRestartCleanupEvent>(OnOfficeRoundRestart);
     }
 
     private EntityUid? Card(EntityUid console, bool operatorSlot)
@@ -59,6 +66,8 @@ public sealed partial class CMUEmploymentConsoleSystem : EntitySystem
 
     private bool Authorized(Entity<CMUEmploymentConsoleComponent> ent)
     {
+        if (CompOrNull<CMUEmploymentOfficeComponent>(ent.Owner)?.Jail == true)
+            return false;
         return _power.IsPowered(ent.Owner)
             && ent.Comp.Operator is { } actor
             && !TerminatingOrDeleted(actor)
@@ -68,7 +77,7 @@ public sealed partial class CMUEmploymentConsoleSystem : EntitySystem
             && TryComp<IdCardComponent>(card, out _)
             && TryComp<AccessComponent>(card, out var access)
             && access.Enabled
-            && access.Tags.Contains(ent.Comp.RequiredAccess);
+            && (_access.TryGetTags(card)?.Contains(ent.Comp.RequiredAccess) ?? false);
     }
 
     private void OnOpened(Entity<CMUEmploymentConsoleComponent> ent, ref BoundUIOpenedEvent args)
@@ -140,7 +149,7 @@ public sealed partial class CMUEmploymentConsoleSystem : EntitySystem
             return;
         }
 
-        if (args.OperatorSlot && (!access.Enabled || !access.Tags.Contains(ent.Comp.RequiredAccess)))
+        if (args.OperatorSlot && (!access.Enabled || !HasOperatorAccess(ent, card)))
         {
             Reject(ent, args.Actor, "cmu-employment-denied");
             return;
@@ -161,7 +170,8 @@ public sealed partial class CMUEmploymentConsoleSystem : EntitySystem
             UpdateUi(ent);
     }
 
-    public bool TryApply(Entity<CMUEmploymentConsoleComponent> ent, EntityUid actor, CMUEmploymentApplyMessage request)
+    public bool TryApply(Entity<CMUEmploymentConsoleComponent> ent, EntityUid actor, CMUEmploymentApplyMessage request,
+        CMUEmploymentConsoleComponent? approvedPolicy = null, string? approvedDepartment = null)
     {
         if (!Authorized(ent) || ent.Comp.Operator != actor)
             return Reject(ent, actor, "cmu-employment-denied");
@@ -182,8 +192,12 @@ public sealed partial class CMUEmploymentConsoleSystem : EntitySystem
         if (request.Action is not (CMUEmploymentAction.Hire or CMUEmploymentAction.Edit or CMUEmploymentAction.Terminate))
             return false;
 
+        var office = CompOrNull<CMUEmploymentOfficeComponent>(ent.Owner);
+        if (approvedPolicy == null && office?.Department != null && request.Action != CMUEmploymentAction.Hire
+            && !IsNativeOfficeEmployee(ent, card))
+            return Reject(ent, actor, "cmu-employment-not-employed");
         var employment = CompOrNull<CMUEmploymentCardComponent>(card);
-        if (request.Action != CMUEmploymentAction.Hire && employment?.Employer != ent.Comp.Faction.Id)
+        if (request.Action != CMUEmploymentAction.Hire && employment?.Employer != ent.Comp.Faction.Id && !(approvedPolicy != null && OfficeAdministrator(ent, actor)) && !IsNativeOfficeEmployee(ent, card))
             return Reject(ent, actor, "cmu-employment-not-employed");
 
         var terminate = request.Action == CMUEmploymentAction.Terminate;
@@ -200,13 +214,14 @@ public sealed partial class CMUEmploymentConsoleSystem : EntitySystem
             return Reject(ent, actor, "cmu-employment-invalid-text");
         }
 
-        if (!terminate && request.Access.Count > ent.Comp.AllowedAccess.Count)
+        if (!terminate && request.Access.Count > (approvedPolicy ?? ent.Comp).AllowedAccess.Count)
             return Reject(ent, actor, "cmu-employment-invalid-access");
 
+        var policy = approvedPolicy ?? ent.Comp;
         var selected = new HashSet<ProtoId<AccessLevelPrototype>>();
-        ProtoId<JobIconPrototype>? jobIcon = terminate ? "JobIconUnknown" : request.JobIcon ?? ent.Comp.DefaultJobIcon;
+        ProtoId<JobIconPrototype>? jobIcon = terminate ? "JobIconUnknown" : request.JobIcon ?? policy.DefaultJobIcon;
         if (!terminate && jobIcon is { } requestedIcon
-            && (!ent.Comp.JobIcons.ContainsKey(requestedIcon) || !ProtoMan.HasIndex(requestedIcon)))
+            && (!policy.JobIcons.ContainsKey(requestedIcon) || !ProtoMan.HasIndex(requestedIcon)))
         {
             return Reject(ent, actor, "cmu-employment-invalid-icon");
         }
@@ -216,10 +231,27 @@ public sealed partial class CMUEmploymentConsoleSystem : EntitySystem
         {
             foreach (var tag in request.Access)
             {
-                if (!ent.Comp.AllowedAccess.Contains(tag) || !ProtoMan.HasIndex(tag))
+                if (!policy.AllowedAccess.Contains(tag) || !ProtoMan.HasIndex(tag))
                     return Reject(ent, actor, "cmu-employment-invalid-access");
                 selected.Add(tag);
             }
+        }
+
+        Entity<DepartmentConsoleComponent>? enrollment = null;
+        var departmentKey = approvedDepartment ?? office?.Department?.Id;
+        if (!terminate && departmentKey != null)
+        {
+            var department = _departments.GetEmploymentDepartments(ent.Owner).Find(entry => entry.Key == departmentKey);
+            if (department == null || !EntityManager.TryGetEntity(department.Console, out var departmentUid)
+                || !TryComp<DepartmentConsoleComponent>(departmentUid, out var departmentComp))
+                return Reject(ent, actor, "cmu-employment-payroll-stale");
+            if (departmentComp.DepartmentAccessLevel is { } departmentAccess)
+            {
+                if (!policy.AllowedAccess.Contains(departmentAccess) || !ProtoMan.HasIndex(departmentAccess))
+                    return Reject(ent, actor, "cmu-employment-invalid-access");
+                selected.Add(departmentAccess);
+            }
+            enrollment = (departmentUid.Value, departmentComp);
         }
 
         // Validate the complete request before touching the card; a failed request must not erase access.
@@ -236,6 +268,8 @@ public sealed partial class CMUEmploymentConsoleSystem : EntitySystem
             return Reject(ent, actor, "cmu-employment-no-changes");
         }
 
+        if (approvedPolicy == null && NeedsOfficeApproval(ent, actor))
+            return QueueHiring(ent, actor, request, card, id, selected);
         var previousAccess = new List<ProtoId<AccessLevelPrototype>>(access.Tags);
         var previousTitle = id.LocalizedJobTitle ?? string.Empty;
         var previousIcon = id.JobIcon;
@@ -254,6 +288,10 @@ public sealed partial class CMUEmploymentConsoleSystem : EntitySystem
 
         employment = EnsureComp<CMUEmploymentCardComponent>(card);
         employment.Employer = terminate ? string.Empty : ent.Comp.Faction.Id;
+        if (enrollment is { } departmentEnrollment)
+            _departments.EnrollEmploymentMember(departmentEnrollment, card);
+        if (terminate && ent.Comp.Theme == CMUEmploymentTheme.Colony)
+            _departments.RemoveEmploymentMember(card);
 
         var action = Loc.GetString(request.Action switch
         {
@@ -286,6 +324,7 @@ public sealed partial class CMUEmploymentConsoleSystem : EntitySystem
             $"card IFF replaced with {(!terminate && request.Iff ? ent.Comp.Faction.Id : "none")}; " +
             $"HUD icon {previousIcon} -> {id.JobIcon}");
         ent.Comp.Revision++;
+        ent.Comp.LastReceipt = new(ent.Comp.Revision, GetNetEntity(card), request.Action, id.FullName ?? Name(card));
         BeginPrint(ent, actor, id, title, request.Action, accessNames, selected.Count,
             !terminate && request.Iff);
         UpdateUi(ent);
@@ -315,10 +354,16 @@ public sealed partial class CMUEmploymentConsoleSystem : EntitySystem
     {
         var authorized = Authorized(ent);
         var profile = GetGovforProfile(ent);
+        var operatorCard = Card(ent.Owner, true);
         var state = new CMUEmploymentState
         {
             Heading = Loc.GetString(ent.Comp.Heading),
             Theme = ent.Comp.Theme,
+            Logo = GetOfficeLogo(ent) ?? GetLogo(ent),
+            Office = GetOfficeState(ent),
+            Colony = ent.Comp.Theme == CMUEmploymentTheme.Colony && authorized ? ent.Comp.ColonySnapshot : null,
+            CanBroadcast = CanBroadcastColony(ent),
+            SirenActive = ent.Comp.Theme == CMUEmploymentTheme.Colony && _colonyComms.SirenActive,
             Brand = profile != null ? Loc.GetString(profile.Brand) : string.Empty,
             Accent = profile?.Accent,
             Background = profile?.Background,
@@ -328,8 +373,11 @@ public sealed partial class CMUEmploymentConsoleSystem : EntitySystem
             Authenticated = authorized,
             Operator = ent.Comp.Operator is { } actor ? GetNetEntity(actor) : null,
             OperatorName = ent.Comp.Operator is { } user && !TerminatingOrDeleted(user) ? Name(user) : string.Empty,
-            OperatorCardInserted = Card(ent.Owner, true) != null,
+            OperatorCardInserted = operatorCard != null,
+            OperatorCardName = operatorCard is { } operatorUid && TryComp<IdCardComponent>(operatorUid, out var operatorId)
+                ? operatorId.FullName ?? Name(operatorUid) : string.Empty,
             Revision = ent.Comp.Revision,
+            Receipt = ent.Comp.LastReceipt,
             DefaultJobIcon = ent.Comp.DefaultJobIcon,
         };
         if (Card(ent.Owner, false) is { } card && TryComp<IdCardComponent>(card, out var id))
@@ -340,7 +388,7 @@ public sealed partial class CMUEmploymentConsoleSystem : EntitySystem
             state.JobIcon = id.JobIcon;
             state.Blank = string.IsNullOrWhiteSpace(id.FullName);
             state.LocalEmployee = TryComp<CMUEmploymentCardComponent>(card, out var employee)
-                && employee.Employer == ent.Comp.Faction.Id;
+                && employee.Employer == ent.Comp.Faction.Id || IsNativeOfficeEmployee(ent, card);
             state.HasIff = _iff.HasFaction(card, ent.Comp.Faction);
             if (_access.TryGetTags(card) is { } tags)
                 state.CurrentAccess.AddRange(tags);
@@ -365,6 +413,8 @@ public sealed partial class CMUEmploymentConsoleSystem : EntitySystem
                 state.Presets.Add(new(Loc.GetString(preset.Name), Loc.GetString(preset.JobTitle), new(preset.Access), preset.JobIcon));
             state.History.AddRange(ent.Comp.History);
         }
+        if (GetOfficeBrand(ent) is { } officeBrand)
+            state.Brand = officeBrand;
         _ui.SetUiState(ent.Owner, CMUEmploymentUiKey.Key, state);
     }
 }

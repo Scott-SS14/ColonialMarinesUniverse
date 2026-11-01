@@ -37,6 +37,7 @@
     containers:
       CMUEmploymentOperator: !type:ContainerSlot
       CMUEmploymentTarget: !type:ContainerSlot
+      CMUEmploymentApprovalPaper: !type:ContainerSlot
   - type: InteractedBlacklist
     blacklist:
       components:
@@ -45,7 +46,7 @@
 - type: entity
   parent: CMUEmploymentConsoleBase
   id: CMUEmploymentConsoleGovfor
-  name: GOVFOR employment console
+  name: GOVFOR department management console
   suffix: Prototype
   description: Programs GOVFOR employment credentials, door access and identification codes.
   components:
@@ -56,6 +57,7 @@
     faction: GOVFOR
     heading: cmu-employment-heading-govfor
     theme: Govfor
+    logo: /Textures/CMU14/Interface/Paper/USCMHeader.png
     formPrototype: CMUPaperBase
     govforProfiles:
       USCM:
@@ -290,9 +292,9 @@
 - type: entity
   parent: CMUEmploymentConsoleBase
   id: CMUEmploymentConsoleColony
-  name: colony employment console
+  name: colony department management console
   suffix: Prototype
-  description: Programs colony employment credentials, door access and identification codes.
+  description: Manages colony personnel credentials, department payroll, announcements and emergency sirens.
   components:
   - type: Sprite
     sprite: CMU14/Structures/Machines/Employment/colony.rsi
@@ -301,6 +303,8 @@
     faction: FactionSurvivor
     heading: cmu-employment-heading-colony
     theme: Colony
+    communicationsAccess: CMAccessColonyCommand
+    logo: /Textures/CMU14/Interface/Paper/SEEGSONHeader.png
     formPrototype: CMUPaperSEEGSON
     allowedAccess:
     - CMAccessColonyPublic
@@ -387,7 +391,7 @@
 - type: entity
   parent: CMUEmploymentConsoleBase
   id: CMUEmploymentConsoleWeyland
-  name: Weyland-Yutani employment console
+  name: Weyland-Yutani department management console
   suffix: Prototype
   description: Programs Company employment credentials, door access and identification codes.
   components:
@@ -398,6 +402,7 @@
     faction: FactionWEYU
     heading: cmu-employment-heading-weyland
     theme: Weyland
+    logo: /Textures/CMU14/Interface/Paper/WEYLANDHeader.png
     formPrototype: CMUPaperWEYLAND
     allowedAccess:
     - CMAccessColonyPublic
@@ -484,4 +489,4 @@
   suffix: Prototype
   components:
   - type: Access
-    tags: [AU14AccessColonyAdministrator]
+    tags: [AU14AccessColonyAdministrator, CMAccessColonyCommand]

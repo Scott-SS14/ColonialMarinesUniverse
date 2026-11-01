@@ -17,6 +17,7 @@ public sealed partial class ColonyCommsConsoleSystem : EntitySystem
     public override void Initialize()
     {
         base.Initialize();
+        InitializeEmploymentIntegration();
         SubscribeLocalEvent<ColonyCommsConsoleComponent, BoundUIOpenedEvent>(OnUiOpened);
         SubscribeLocalEvent<ColonyCommsConsoleComponent, ColonyCommsConsoleMessage>(OnMessageSent);
         SubscribeLocalEvent<ColonyCommsConsoleComponent, ColonyCommsConsoleSendMessageBuiMsg>(OnSendMessageBuiMsg);
@@ -52,27 +53,6 @@ public sealed partial class ColonyCommsConsoleSystem : EntitySystem
 
     private void OnSirenBuiMsg(EntityUid uid, ColonyCommsConsoleComponent component, ColonyCommsConsoleSirenBuiMsg args)
     {
-        var sirenActive = !component.SirenActive;
-        var sirenQuery = AllEntityQuery<ColonySirenComponent>();
-        while (sirenQuery.MoveNext(out var sirenUid, out _))
-        {
-            if (sirenActive)
-            {
-                if (!HasComp<AmbientSoundComponent>(sirenUid))
-                {
-                    var ambient = AddComp<AmbientSoundComponent>(sirenUid);
-                    _ambientSound.SetSound(sirenUid, new SoundPathSpecifier("/Audio/CMU14/Machines/ColonySiren.ogg"), ambient);
-                    _ambientSound.SetRange(sirenUid, 48f, ambient);
-                    _ambientSound.SetVolume(sirenUid, -1f, ambient);
-                    _ambientSound.SetAmbience(sirenUid, true, ambient);
-                }
-                else if (TryComp<AmbientSoundComponent>(sirenUid, out var ambient))
-                    _ambientSound.SetVolume(sirenUid, -2f, ambient);
-            }
-            else if (TryComp<AmbientSoundComponent>(sirenUid, out var ambient))
-                _ambientSound.SetVolume(sirenUid, -999f, ambient); // mute
-        }
-        // Persist state on console (even when there's no siren comps)
-        component.SirenActive = sirenActive;
+        SetColonySiren(!SirenActive);
     }
 }

@@ -17,8 +17,20 @@ public sealed partial class CMUEmploymentConsoleSystem
         return platoon != null && ent.Comp.GovforProfiles.TryGetValue(platoon.ID, out var profile) ? profile : null;
     }
 
+    private string GetLogo(Entity<CMUEmploymentConsoleComponent> ent)
+    {
+        if (ent.Comp.Theme == CMUEmploymentTheme.Govfor)
+        {
+            var platoon = EntityManager.EntitySysManager
+                .GetEntitySystem<PlatoonSpawnRuleSystem>().SelectedGovforPlatoon;
+            if (platoon?.PlatoonPatch is { } patch)
+                return patch.ToString();
+        }
+        return ent.Comp.Logo.ToString();
+    }
+
     private EntProtoId<PaperComponent> GetFormPrototype(Entity<CMUEmploymentConsoleComponent> ent)
-        => GetGovforProfile(ent)?.Paper ?? ent.Comp.FormPrototype;
+        => GetOfficeFormPrototype(ent) ?? GetGovforProfile(ent)?.Paper ?? ent.Comp.FormPrototype;
 
     private void OnRunLevelChanged(GameRunLevelChangedEvent args)
     {

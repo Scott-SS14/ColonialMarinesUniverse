@@ -28,6 +28,19 @@ public sealed partial class CMUEmploymentConsoleComponent : Component
     [DataField]
     public CMUEmploymentTheme Theme;
 
+    [DataField(required: true)]
+    public ResPath Logo;
+
+    [DataField]
+    public ProtoId<AccessLevelPrototype>? CommunicationsAccess;
+
+    public CMUEmploymentColonyState? ColonySnapshot;
+    public int ColonySnapshotRevision;
+    public TimeSpan ColonyRefreshAt;
+    public TimeSpan ColonyCommsReadyAt;
+    public TimeSpan ColonySirenReadyAt;
+    public TimeSpan ColonyPayrollReadyAt;
+
     [DataField]
     public List<ProtoId<AccessLevelPrototype>> AllowedAccess = new();
 
@@ -63,6 +76,7 @@ public sealed partial class CMUEmploymentConsoleComponent : Component
 
     public EntityUid? Operator;
     public int Revision;
+    public CMUEmploymentReceipt? LastReceipt;
     public List<string> History = new();
 }
 

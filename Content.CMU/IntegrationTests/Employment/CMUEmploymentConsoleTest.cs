@@ -88,18 +88,28 @@ public sealed class CMUEmploymentConsoleTest : GameTest
                 if (selectedIcon != null)
                     Assert.That(id.JobIcon, Is.EqualTo(new ProtoId<JobIconPrototype>(selectedIcon)));
                 Assert.That(component.History, Has.Count.EqualTo(1));
+                var receipt = component.LastReceipt;
+                Assert.That(receipt, Is.Not.Null, "A completed transaction must acknowledge the UI.");
+                Assert.That(receipt!.Card, Is.EqualTo(entities.GetNetEntity(target)));
+                Assert.That(receipt.Action, Is.EqualTo(CMUEmploymentAction.Hire));
+                Assert.That(receipt.Name, Is.EqualTo(id.FullName));
                 Assert.That(system.TryApply((console, component), actor, hire), Is.False,
                     "Replaying an applied request must not execute it again.");
+                Assert.That(component.LastReceipt, Is.SameAs(receipt), "A replay must not create another success receipt.");
                 Assert.That(entities.HasComponent<CMUEmploymentPrintJobComponent>(console), Is.True);
+                Assert.That(receipt!.Printed, Is.False);
                 var power = entities.GetComponent<ApcPowerReceiverComponent>(console);
                 power.PowerDisabled = true;
                 system.Update(10f);
                 Assert.That(entities.HasComponent<CMUEmploymentPrintJobComponent>(console), Is.True,
                     "Power loss must pause the print job without reapplying the credentials.");
+                Assert.That(component.LastReceipt!.Printed, Is.False, "A paused printer must not report a completed record.");
                 power.PowerDisabled = false;
                 system.Update(10f);
                 Assert.That(entities.HasComponent<CMUEmploymentPrintJobComponent>(console), Is.False);
                 CollectPrintouts();
+                receipt = component.LastReceipt;
+                Assert.That(receipt!.Printed, Is.True, "The UI may report a printed record only after the paper was created.");
                 Assert.That(printedCount, Is.EqualTo(1), "One successful transaction prints one record.");
 
                 var duplicate = new CMUEmploymentApplyMessage(entities.GetNetEntity(target), component.Revision,
@@ -108,11 +118,15 @@ public sealed class CMUEmploymentConsoleTest : GameTest
                     selectedIcon == null ? null : new ProtoId<JobIconPrototype>(selectedIcon));
                 Assert.That(system.TryApply((console, component), actor, duplicate), Is.False,
                     "Identical credentials must not issue another personnel record.");
+                Assert.That(component.LastReceipt, Is.SameAs(receipt), "An unchanged request must not acknowledge a new transaction.");
                 Assert.That(component.History, Has.Count.EqualTo(1));
 
                 var terminate = new CMUEmploymentApplyMessage(entities.GetNetEntity(target), component.Revision,
                     CMUEmploymentAction.Terminate, string.Empty, string.Empty, new(), false, true);
                 Assert.That(system.TryApply((console, component), actor, terminate), Is.True);
+                Assert.That(component.LastReceipt, Is.Not.SameAs(receipt));
+                Assert.That(component.LastReceipt!.Action, Is.EqualTo(CMUEmploymentAction.Terminate));
+                Assert.That(component.LastReceipt.Card, Is.EqualTo(entities.GetNetEntity(target)));
                 Assert.That(entities.GetComponent<AccessComponent>(target).Tags, Is.Empty);
                 Assert.That(iff.HasFaction(target, component.Faction), Is.False);
                 Assert.That(iff.HasFaction(target, "FactionCLF"), Is.False);
@@ -198,6 +212,7 @@ public sealed class CMUEmploymentConsoleTest : GameTest
                     Is.EquivalentTo(new ProtoId<AccessLevelPrototype>[] { "AU14AccessOpfor" }));
                 Assert.That(iff.HasFaction(target, "FactionCLF"), Is.True);
                 Assert.That(component.History, Is.Empty);
+                Assert.That(component.LastReceipt, Is.Null, "Rejected requests must not produce success feedback.");
             });
         }
         finally
